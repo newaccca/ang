@@ -1,0 +1,248 @@
+<div>
+    <div>
+        <button mat-raised-button (click)="fn_savedt()"> log dat</button>
+
+        <select id="value_dcombobox">
+            <option multiple *ngFor="let option of options">{{ option }}</option>
+        </select>
+    </div>
+    <mat-divider></mat-divider>
+    <input matInput placeholder="Ex. Pizza" id="value_dtextbox">
+    <mat-divider></mat-divider>
+    <div>
+        <mat-form-field>
+            <mat-label>Favorite food</mat-label>
+            <mat-select [(ngModel)]="goten_value_dcombobox_Check" multiple (ngModelChange)="error_check()">
+                <mat-option>-- None --</mat-option>
+                <mat-optgroup *ngFor="let food of options">
+                    <mat-option *ngFor="let uu of options" [value]="uu">
+                        {{uu}}
+                    </mat-option>
+                    {{food}}
+                </mat-optgroup>
+
+
+            </mat-select>
+        </mat-form-field>
+        <mat-label style="color: red;">{{error}}</mat-label>
+    </div>
+    <mat-divider></mat-divider>
+    <div>
+        <mat-checkbox *ngFor="let option of options; let i = index" [(ngModel)]="goten_value_dcheck[i]"
+            class="example-margin">{{option}}</mat-checkbox>
+    </div>
+    <mat-divider></mat-divider>
+    <div>
+
+    </div>
+
+
+    <mat-divider></mat-divider>
+
+    <div>
+        <mat-radio-group aria-labelledby="example-radio-group-label" class="example-radio-group"
+            [(ngModel)]="goten_value_dradio_btn">
+            <mat-radio-button class="example-radio-button" *ngFor="let season of options" [value]="season">
+                {{season}}
+            </mat-radio-button>
+        </mat-radio-group>
+    </div>
+    <button mat-raised-button (click)="save_from_html_function()"> Save
+    </button>
+    <button mat-raised-button (click)="save_from_html_todb_function()"> Save to db
+    </button>
+
+    <mat-divider></mat-divider>
+
+
+
+    <div class="btn-holder"  >
+        <button mat-raised-button (click)="opendialog_function(dialog_1)">Dialog_1</button>
+    </div>
+    <div class="bottm-panel" style="width: 100%; overflow-y: auto; ">
+        <p>table control</p>
+        <div class="mat-elevation-z8_bottom">
+            <select style="width: auto" [(ngModel)]="empty_data" (ngModelChange)="applyFilter3('dcombobox', $event)">
+                <option *ngFor="let uu of filter_dcombobox" [value]="uu">{{ uu }}</option>
+            </select>
+            <select style="width: auto" [(ngModel)]="empty_data"
+                (ngModelChange)="applyFilter3('dcombobox_Check', $event)">
+                <option *ngFor="let uu of filter_dcombobox_Check" [value]="uu">{{ uu }}</option>
+            </select>
+            <select style="width: auto" [(ngModel)]="empty_data" (ngModelChange)="applyFilter3('dtextbox', $event)">
+                <option *ngFor="let uu of filter_dtextbox" [value]="uu">{{ uu }}</option>
+            </select>
+            <select style="width: auto" [(ngModel)]="empty_data" (ngModelChange)="applyFilter3('dradio_btn', $event)">
+                <option *ngFor="let uu of filter_dradio_btn" [value]="uu">{{ uu }}</option>
+            </select>
+            <select style="width: auto" [(ngModel)]="empty_data" (ngModelChange)="applyFilter3('dcheck', $event)">
+                <option *ngFor="let uu of filter_dcheck" [value]="uu">{{ uu }}</option>
+            </select>
+            <select style="width: auto" [(ngModel)]="empty_data" (ngModelChange)="applyFilter3('dtoggle', $event)">
+                <option *ngFor="let uu of filter_dtoggle" [value]="uu">{{ uu }}</option>
+            </select>
+            <input id="leng" style="width: 98.5%" [(ngModel)]="leng" (ngModelChange)="onSelectChange2($event)"
+                type="number" value="10" />
+            <table mat-table [dataSource]="dataSource" matSort multiTemplateDataRows>
+                <!-- ID Column -->
+                <ng-container matColumnDef="dcombobox">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>dcombobox</th>
+                    <td mat-cell *matCellDef="let row">{{ row.dcombobox }}</td>
+                </ng-container>
+                <!-- Progress Column -->
+                <ng-container matColumnDef="dcombobox_Check">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>dcombobox_Check</th>
+                    <td mat-cell *matCellDef="let row">{{ row.dcombobox_Check }}</td>
+                </ng-container>
+                <!-- Name Column -->
+                <ng-container matColumnDef="dtextbox">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>dtextbox</th>
+                    <td mat-cell *matCellDef="let row">{{ row.dtextbox }}</td>
+                </ng-container>
+                <!-- Fruit Column -->
+                <ng-container matColumnDef="dradio_btn">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>dradio_btn</th>
+                    <td mat-cell *matCellDef="let row">
+                        {{ row.dradio_btn }}
+                    </td>
+                </ng-container> <!-- Fruit Column -->
+                <ng-container matColumnDef="dcheck">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>dcheck</th>
+                    <td mat-cell *matCellDef="let row">
+                        {{ row.dcheck }}
+                    </td>
+                </ng-container> <!-- Fruit Column -->
+                <ng-container matColumnDef="dtoggle">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>dtoggle</th>
+                    <td mat-cell *matCellDef="let row">
+                        {{ row.dtoggle }}
+                    </td>
+                </ng-container>
+                <!-- Button Columnsss -->
+                <!-- <ng-container matColumnDef="button">
+                    <th mat-header-cell *matHeaderCellDef>Button</th>
+                    <td mat-cell *matCellDef="let row">
+                        <button mat-raised-button matTooltip="Info about the action {{ row.id }}"
+                            aria-label="Button that displays a tooltip when focused or hovered over"
+                            (click)="expandRow($event, row)">
+                            Button Text
+                        </button>
+                        <button style="font-size: 10px !important; background-color: blueviolet !important;"
+                            mat-raised-button (click)="showdialog($event)">
+                            this button for showing not to click on row function works
+                        </button>
+                        <button mat-raised-button (click)="opendialog_function(dialog_1)"
+                            (click)="showdialog($event)">Dialog_final WITH noe row click</button>
+                    </td>
+                </ng-container> -->
+                <!-- Expanded Content -->
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="select_rowclick($event, row)"
+                    [ngClass]="{'bold': clickedRows.has(row)}" [class.demo-row-is-clicked]="clickedRows.has(row)"></tr>
+
+            </table>
+
+
+        </div>
+
+    </div>
+    <div>
+        <h3>Click Log</h3>
+    </div>
+    <div *ngIf="!clickedRows.size">Clicked rows will be logged here</div>
+    <ul>
+        <li *ngFor="let clickedRow of clickedRows">
+            Clicked on {{ clickedRow.dcombobox }}
+        </li>
+    </ul>
+    <mat-paginator [length]="pgsize" [pageSize]="leng" >
+    </mat-paginator>
+</div>
+<ng-template #dialog_1>
+
+    <div class="bottm-panel" style="width: 100%; overflow-y: auto; ">
+<div style="overflow-x: autoweb; max-height: 550px;">
+        <table mat-table [dataSource]="dataSource" matSort multiTemplateDataRows>
+            <!-- ID Column -->
+            <ng-container matColumnDef="dcombobox">
+                <th mat-header-cell *matHeaderCellDef >dcombobox</th>
+                <td mat-cell *matCellDef="let row">{{ row.dcombobox }}</td>
+            </ng-container>
+            <!-- Progress Column -->
+            <ng-container matColumnDef="dcombobox_Check">
+                <th mat-header-cell *matHeaderCellDef >dcombobox_Check</th>
+                <td mat-cell *matCellDef="let row">{{ row.dcombobox_Check }}</td>
+            </ng-container>
+            <!-- Name Column -->
+            <ng-container matColumnDef="dtextbox">
+                <th mat-header-cell *matHeaderCellDef >dtextbox</th>
+                <td mat-cell *matCellDef="let row">{{ row.dtextbox }}</td>
+            </ng-container>
+            <!-- Fruit Column -->
+            <ng-container matColumnDef="dradio_btn">
+                <th mat-header-cell *matHeaderCellDef >dradio_btn</th>
+                <td mat-cell *matCellDef="let row">
+                    {{ row.dradio_btn }}
+                </td>
+            </ng-container> <!-- Fruit Column -->
+            <ng-container matColumnDef="dcheck">
+                <th mat-header-cell *matHeaderCellDef >dcheck</th>
+                <td mat-cell *matCellDef="let row">
+                    {{ row.dcheck }}
+                </td>
+            </ng-container> <!-- Fruit Column -->
+            <ng-container matColumnDef="dtoggle">
+                <th mat-header-cell *matHeaderCellDef >dtoggle</th>
+                <td mat-cell *matCellDef="let row">
+                    {{ row.dtoggle }}
+                </td>
+            </ng-container>
+            <!-- Button Columnsss -->
+            <!-- <ng-container matColumnDef="button">
+                    <th mat-header-cell *matHeaderCellDef>Button</th>
+                    <td mat-cell *matCellDef="let row">
+                        <button mat-raised-button matTooltip="Info about the action {{ row.id }}"
+                            aria-label="Button that displays a tooltip when focused or hovered over"
+                            (click)="expandRow($event, row)">
+                            Button Text
+                        </button>
+                        <button style="font-size: 10px !important; background-color: blueviolet !important;"
+                            mat-raised-button (click)="showdialog($event)">
+                            this button for showing not to click on row function works
+                        </button>
+                        <button mat-raised-button (click)="opendialog_function(dialog_1)"
+                            (click)="showdialog($event)">Dialog_final WITH noe row click</button>
+                    </td>
+                </ng-container> -->
+            <!-- Expanded Content -->
+            <ng-container matColumnDef="expandedContent">
+                <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
+                    <div class="collapse fade" [class.show]="isRowExpanded(row)">
+                        <ul style="border: none; padding: none; margin: 0; top: 0">
+                            <li style="border: none; padding: none; margin: 0; top: 0">
+                                Nutritional value: {{ row.dcombobox_Check }}
+                            </li>
+                            <li style="border: none; padding: none; margin: 0; top: 0">
+                                Origin: {{ row.dcombobox }}
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="expandRow($event, row)"
+                [ngClass]="{'bold': clickedRows.has(row)}" [class.demo-row-is-clicked]="clickedRows.has(row)"></tr>
+            <tr mat-row *matRowDef="
+                let row;
+                columns: ['expandedContent'];
+                when: isExpansionDetailRow
+              " [hidden]="!isRowExpanded(row)"></tr>
+        </table>
+
+
+    </div>
+    <mat-paginator [length]="dialog_pgsize" [pageSize]="dialog_leng" aria-label="Select page of GitHub search results">
+        </mat-paginator>
+    </div>
+</ng-template>
