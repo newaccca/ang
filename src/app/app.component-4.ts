@@ -103,7 +103,7 @@ export class AppComponent4 implements AfterViewInit {
     // add or remove the clicked row from the set
   }
   getData_forthetable_http() {
-    return this.http.get<any>('http://localhost:5241/api/TreeData/newww');
+    return this.http.get<any>('http://a7d8f07df7c4f4e498670422e576b190-464247745.eu-north-1.elb.amazonaws.com/api/TreeData/newww');
   }
   ngAfterViewInit(): void {
     this.getData_forthetable_http().subscribe((data) => {
@@ -147,7 +147,7 @@ export class AppComponent4 implements AfterViewInit {
   this.novalidata="*missing"
  }else{
   this.novalidata=""
-  fetch('http://localhost:5241/api/TreeData/newww', {
+  fetch('http://a7d8f07df7c4f4e498670422e576b190-464247745.eu-north-1.elb.amazonaws.com/api/TreeData/newww', {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json'
@@ -177,7 +177,7 @@ export class AppComponent4 implements AfterViewInit {
 
  }
     // this is delete command but with no data input thats why we used fetch above
-    // this.http.delete('http://localhost:5241/api/TreeData/newww'
+    // this.http.delete('http://a7d8f07df7c4f4e498670422e576b190-464247745.eu-north-1.elb.amazonaws.com/api/TreeData/newww'
     // ).subscribe(response => {
     //   console.log(response);
     // }, error => {
@@ -386,6 +386,9 @@ export class AppComponent4 implements AfterViewInit {
   }
   ref_pub: any;
   pupblic_opendialog_function(dialog_name: any , width: any, hight:any) {
+    if (dialog_name._declarationTContainer.localNames[0] == 'delete_dialog'){
+      this.toast.warning({detail:'Warning',summary:'You are about to delete the whole db',position:'topRight', duration:1500});
+    }
     const dialog_configurtion = new MatDialogConfig();
     dialog_configurtion.autoFocus = true;
     dialog_configurtion.width = width;
@@ -393,7 +396,7 @@ export class AppComponent4 implements AfterViewInit {
     let ref = this.Dialog1.open(dialog_name, dialog_configurtion);
     this.ref_pub=ref
     ref.afterOpened().subscribe(() => {
-      console.log('Dialog opened', dialog_name);
+      console.log('Dialog opened', dialog_name._declarationTContainer.localNames[0]);
     });
     ref.afterClosed().subscribe(() => {
       console.log('Dialog closed', dialog_name);
@@ -531,7 +534,7 @@ stoppad(event: MouseEvent , uu:string){
     console.log(JSON.stringify(this.dataSource.data));
     this.datttt = this.dataSource.data;
     this.http
-      .post<any>('http://localhost:5241/api/TreeData/newww', this.datttt)
+      .post<any>('http://a7d8f07df7c4f4e498670422e576b190-464247745.eu-north-1.elb.amazonaws.com/api/TreeData/newww', this.datttt)
       .subscribe({
         next: (data) => {
           //// <== old code
