@@ -30,7 +30,7 @@ import { HttpClient } from '@angular/common/http';
 import { NgIf } from '@angular/common';
 import {  MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
-
+import { NgToastService } from 'ng-angular-popup';
 
 // for the tables testing
 export interface UserData {
@@ -140,6 +140,7 @@ export class AppComponent {
     private http: HttpClient,
     private Dialog1: MatDialog,
     private router:Router,
+    private toast:NgToastService,
   ) {
     this.fortreedataSource.data = this.TREE_DATA;
     const users = Array.from({ length: 50 }, (_, k) =>

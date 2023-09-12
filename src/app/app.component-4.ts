@@ -7,6 +7,7 @@ import {
   ElementRef,
   Renderer2,
 } from '@angular/core';
+import { NgToastService } from 'ng-angular-popup';
 
 // treeeeee
 import { MatTreeNestedDataSource } from '@angular/material/tree';
@@ -28,25 +29,25 @@ import { DataService } from './data.service';
 import { HttpClient } from '@angular/common/http';
 
 import { Router } from '@angular/router';
+import { ThisReceiver } from '@angular/compiler';
 
 // for the tables testing
 export interface UserData {
-    dcombobox: string;
-    dcombobox_Check: string;
-    dtextbox: string;
-    dradio_btn: string;
-    dcheck: string;
-    dtoggle: string;
+  dcombobox: string;
+  dcombobox_Check: string;
+  dtextbox: string;
+  dradio_btn: string;
+  dcheck: string;
+  dtoggle: string;
   detailRow: boolean;
 }
-
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component-4.html',
   styleUrls: ['./app.component-4.css'],
 })
-export class AppComponent4 implements AfterViewInit{
+export class AppComponent4 implements AfterViewInit {
   displayedColumns: string[] = [
     'dcombobox',
     'dcombobox_Check',
@@ -59,8 +60,8 @@ export class AppComponent4 implements AfterViewInit{
   dataSource = new MatTableDataSource<UserData>();
   leng = 10;
   pgsize = 0;
-  dialog_leng=10;
-  dialog_pgsize=0;
+  dialog_leng = 10;
+  dialog_pgsize = 0;
   filter_dcombobox: any = [];
   filter_dcombobox_Check: any = [];
   filter_dtextbox: any = [];
@@ -106,16 +107,12 @@ export class AppComponent4 implements AfterViewInit{
   }
   ngAfterViewInit(): void {
     this.getData_forthetable_http().subscribe((data) => {
-      console.log('data-------');
       this.dataSource.data = data;
-      console.log("-----------------------------------------------0000000000000")
-      console.log(JSON.stringify(this.dataSource.data));
-      this.onSelectChange2(5)
-      this.cd.detectChanges()
-      this.dataSource.sort=this.sort;
-      this.filter_call()
+      this.onSelectChange2(5);
+      this.cd.detectChanges();
+      this.dataSource.sort = this.sort;
+      this.filter_call();
     });
-
   }
   select_rowclick(event: MouseEvent, row: any) {
     // add or remove the clicked row from the set
@@ -124,15 +121,71 @@ export class AppComponent4 implements AfterViewInit{
     } else {
       this.clickedRows.add(row);
     }
-    console.log((this.clickedRows))
+    console.log(this.clickedRows);
   }
 
   // on start code initiation
   ngOnInit() {
     // filtration on loading
+    this.goten_value_dcombobox_Check = [];
     this.filter_call();
   }
-  filter_call(){
+  novalidata='';
+  novali(validation:any){
+    if (validation === '') {
+      this.novalidata="*missing"
+     }else{
+      this.novalidata=""
+      this.delete_from_db_function(validation)
+      let inputField = document.getElementById('validation') as HTMLInputElement;
+      inputField.value = '';
+     }
+  }
+  delete_from_db_function(validation:string){
+    console.log(validation)
+    if (validation === '') {
+  this.novalidata="*missing"
+ }else{
+  this.novalidata=""
+  fetch('http://localhost:5241/api/TreeData/newww', {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(validation) // replace 'yourData' with the data you want to send
+
+  })
+  .then(data => {console.log(data);
+  if (data.status==200){
+    this.novalidata=''
+    this.toast.success({detail:'Success',summary:'Items has been deleted successfully',position:'topRight', duration:1500});
+    this.dataSource.data=[];
+    this.public_clsoe_Dialog()
+    this.filter_call()
+  }else{
+    this.novalidata = 'Error ' + (data.status == 401 ? '401 Unauthorized' : data.status)
+    this.toast.error({detail:'Error',summary:('Error ' + (data.status == 401 ? '401 Unauthorized' : data.status)),position:'topRight', duration:1500});
+  }
+  } )
+
+  .catch((error) => {
+    this.novalidata = 'Error ' + error
+    console.error('Error:', error);this.toast.error({detail:'Error',summary:('Error' +error),position:'topRight', duration:1500});
+
+  });
+  this.filter_call()
+
+ }
+    // this is delete command but with no data input thats why we used fetch above
+    // this.http.delete('http://localhost:5241/api/TreeData/newww'
+    // ).subscribe(response => {
+    //   console.log(response);
+    // }, error => {
+    //   console.error(error);
+    // });
+  }
+  // filtering function
+  filter_call() {
     for (let uu of this.dataSource.data) {
       if (!this.filter_dcombobox.includes(uu.dcombobox)) {
         this.filter_dcombobox.push(uu.dcombobox);
@@ -176,14 +229,13 @@ export class AppComponent4 implements AfterViewInit{
     private router: Router,
     private elementRef: ElementRef,
     private renderer: Renderer2,
-    private dataservice: DataService
+    private dataservice: DataService,
+    private toast:NgToastService,
   ) {
     this.fortreedataSource.data = this.TREE_DATA;
     const users: any = this.dataservice.getData_table();
     this.dataservice.getData().subscribe((data) => {
-      console.log('data-------');
       this.fortreedataSource.data = data;
-      console.log(JSON.stringify(this.fortreedataSource.data));
     });
     this.users_out = users;
   }
@@ -231,23 +283,20 @@ export class AppComponent4 implements AfterViewInit{
     console.log(name);
   }
   calloninit() {
+    // a function for calling at the begging
     this.leng = 15;
     this.paginator.pageSize = this.leng;
     this.dataSource.paginator = this.paginator;
-    console.log('clicked');
   }
   // applying the filter to the tablev
   empty_data: any = [];
   // filters fro dropdowns
   applyFilter3(column: string, event: any) {
     const filterValue = this.empty_data;
-
     this.dataSource.filterPredicate = (data: any, filter: string) => {
       return data[column].toLowerCase().includes(filter);
     };
-
     this.dataSource.filter = filterValue.trim().toLowerCase();
-
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
@@ -255,13 +304,10 @@ export class AppComponent4 implements AfterViewInit{
   //filters for textboxes
   applyFilter2(column: string, event: any) {
     const filterValue = (event.target as HTMLInputElement).value;
-
     this.dataSource.filterPredicate = (data: any, filter: string) => {
       return data[column].toLowerCase().includes(filter);
     };
-
     this.dataSource.filter = filterValue.trim().toLowerCase();
-
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
@@ -277,14 +323,12 @@ export class AppComponent4 implements AfterViewInit{
     this.leng = event;
     this.paginator.pageSize = this.leng;
     this.dataSource.paginator = this.paginator;
-
     console.log('Selected value:', event);
   }
   // filtering for all
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
-
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
@@ -331,12 +375,31 @@ export class AppComponent4 implements AfterViewInit{
   expandNode(node: any) {
     console.log('expandNode called with node:', node);
   }
-
   onTypeChange(value: any) {
     return value;
   }
   lengg: any;
   selectedType2: any;
+  public_clsoe_Dialog(){
+    this.ref_pub.close()
+    this.ref_pub = ""
+  }
+  ref_pub: any;
+  pupblic_opendialog_function(dialog_name: any , width: any, hight:any) {
+    const dialog_configurtion = new MatDialogConfig();
+    dialog_configurtion.autoFocus = true;
+    dialog_configurtion.width = width;
+    dialog_configurtion.height = hight;
+    let ref = this.Dialog1.open(dialog_name, dialog_configurtion);
+    this.ref_pub=ref
+    ref.afterOpened().subscribe(() => {
+      console.log('Dialog opened', dialog_name);
+    });
+    ref.afterClosed().subscribe(() => {
+      console.log('Dialog closed', dialog_name);
+    });
+  }
+
   opendialog_function(dialog_name: any) {
     const dialog_configurtion = new MatDialogConfig();
     dialog_configurtion.autoFocus = true;
@@ -345,110 +408,150 @@ export class AppComponent4 implements AfterViewInit{
     let ref = this.Dialog1.open(dialog_name, dialog_configurtion);
     ref.afterOpened().subscribe(() => {
       console.log('Dialog opened');
-      this.dataSource.sort=this.sort;
+      this.dataSource.sort = this.sort;
       this.dialog_leng = this.dataSource.data.length;
-      this.paginator.length=this.dialog_pgsize;
+      this.paginator.length = this.dialog_pgsize;
       this.paginator.pageSize = this.dialog_leng;
       this.dataSource.paginator = this.paginator;
-
     });
-
     ref.afterClosed().subscribe(() => {
       console.log('Dialog closed');
       this.leng = 5;
       this.paginator.pageSize = this.leng;
       this.dataSource.paginator = this.paginator;
-      this.dataSource.sort=this.sort;
-
+      this.dataSource.sort = this.sort;
     });
-    }
-  //['dcombobox', '', '', '', '', ''];
-  options = ['Extra cheese', 'Mushroom', 'Onion', 'Pepperoni', 'Sausage', 'Tomato'];
-
-  fn_savedt(){
-    console.log(JSON.stringify(this.dataSource.data))
   }
-  goten_value_dcombobox_Check: any = [];
-  goten_value_dradio_btn: any = [];
-  goten_value_dcheck:any =[];
-  get_from_html_function(): UserData {
-    let value_dcombobox = document.getElementById('value_dcombobox') as HTMLInputElement;
-    let goten_value_dcombobox = value_dcombobox.value;
-
-
-
-      let value_dtextbox = document.getElementById('value_dtextbox') as HTMLInputElement;
-      let goten_value_dtextbox = value_dtextbox.value;
-
-    let phrase = this.goten_value_dcombobox_Check.join('","')
-
-    let phrase_1 = (this.options.filter((option, index) => this.goten_value_dcheck[index]))
-    console.log(this.goten_value_dcombobox_Check)
-    console.log('---------')
-    console.log(phrase)
-
-     return {
-       dcombobox:goten_value_dcombobox,
-       dcombobox_Check:(`"${phrase}"`),
-       dtextbox:goten_value_dtextbox,
-       dradio_btn:this.goten_value_dradio_btn,
-       dcheck:(`"${phrase_1}"`),
-       dtoggle:'testing',
-       detailRow:false,
-    };
-  }
- l: number = 1;
-  error: any ='';
-  save_from_html_function(){
-    let data = this.get_from_html_function();
-    if (this.goten_value_dcombobox_Check.length === 0) {
-      // this.goten_value_dcombobox_Check is empty
-      this.error='*missing'
+  isBold = false;
+  selectedFood: string[] = [];
+  optg = ['Part1', 'Part2', 'Part3'];
+  options = [
+    'Extra cheese',
+    'Mushroom',
+  ];
+  optionsMap: { [key: string]: string[] } = {
+    'Part1': ['Extra cheese', 'Mushroom'],
+    'Part2': ['Onion', 'Pepperoni'],
+    'Part3': ['Sausage', 'Tomato']
+};
+stoppad(event: MouseEvent , uu:string){
+  event.stopPropagation();
+  console.log(uu)
+}
+  group_fun(event: MouseEvent, food: string) {
+    console.log(food);
+    this.isBold = !this.isBold;
+    const index = this.selectedFood.indexOf(food);
+    if (index > -1) {
+      // If the food is already selected, remove it from the list
+      this.selectedFood.splice(index, 1);
+      for (let value of this.optionsMap[food]) {
+        console.log('remove Value:', value);
+        let index2 = this.goten_value_dcombobox_Check.indexOf(value);
+        if (index2 > -1) {
+          this.goten_value_dcombobox_Check.splice(index2, 1);
+        }
+        this.cd.detectChanges();
+      }
     } else {
-      this.error=''
-      // this.goten_value_dcombobox_Check is not empty
-      for (let value of this.goten_value_dcombobox_Check) {
-        let newData = {...data};
-        newData.dcombobox_Check = value + ' - ' + this.l;
-        this.dataSource.data.push(newData);
-        this.l=this.l +1
+      // If the food is not selected, add it to the list
+      this.selectedFood.push(food);
+      for (let value of this.optionsMap[food]) {
+        console.log('pushed Value:', value);;
+        if (!this.goten_value_dcombobox_Check.includes(value)) {
+            this.goten_value_dcombobox_Check.push(value);
+        }        this.cd.detectChanges();
       }
     }
 
-    this.dataSource.sort=this.sort;
-    this.filter_call()
-    this.onSelectChange2(5)
-    this.cd.detectChanges()
 
+    console.log(this.goten_value_dcombobox_Check.length)
+    for (let v of this.goten_value_dcombobox_Check){
+      console.log(v)
+    }
+    this.error_check()
   }
-   datttt :any;
-
-  save_from_html_todb_function(){
+  fn_savedt() {
     console.log(JSON.stringify(this.dataSource.data));
-    this.datttt = (this.dataSource.data);
-
+  }
+  goten_value_dcombobox_Check: any = [];
+  goten_value_dradio_btn: any = [];
+  goten_value_dcheck: any = [];
+  get_from_html_function(): UserData {
+    let value_dcombobox = document.getElementById(
+      'value_dcombobox'
+    ) as HTMLInputElement;
+    let goten_value_dcombobox = value_dcombobox.value;
+    let value_dtextbox = document.getElementById(
+      'value_dtextbox'
+    ) as HTMLInputElement;
+    let goten_value_dtextbox = value_dtextbox.value;
+    let phrase = this.goten_value_dcombobox_Check.join('","');
+    let phrase_1 = this.options.filter(
+      (option, index) => this.goten_value_dcheck[index]
+    );
+    console.log(this.goten_value_dcombobox_Check);
+    console.log('---------');
+    console.log(phrase);
+    return {
+      dcombobox: goten_value_dcombobox,
+      dcombobox_Check: `"${phrase}"`,
+      dtextbox: goten_value_dtextbox,
+      dradio_btn: this.goten_value_dradio_btn,
+      dcheck: `"${phrase_1}"`,
+      dtoggle: 'testing',
+      detailRow: false,
+    };
+  }
+  l: number = 1;
+  error: any = '';
+  save_from_html_function() {
+    let data = this.get_from_html_function();
+    if (this.goten_value_dcombobox_Check.length === 0) {
+      // this.goten_value_dcombobox_Check is empty
+      this.error = '*missing';
+    } else {
+      this.error = '';
+        this.toast.success({detail:'Success',summary:'Added the data to the table',position:'topRight', duration:1500});
+      // this.goten_value_dcombobox_Check is not empty
+      for (let value of this.goten_value_dcombobox_Check) {
+        let newData = { ...data };
+        newData.dcombobox_Check = value + ' - ' + this.l;
+        this.dataSource.data.push(newData);
+        this.l = this.l + 1;
+      }
+          this.dataSource.sort = this.sort;
+    this.filter_call();
+    this.onSelectChange2(5);
+    this.cd.detectChanges();
+    }
+  }
+  datttt: any;
+  save_from_html_todb_function() {
+    console.log(JSON.stringify(this.dataSource.data));
+    this.datttt = this.dataSource.data;
     this.http
       .post<any>('http://localhost:5241/api/TreeData/newww', this.datttt)
       .subscribe({
         next: (data) => {
           //// <== old code
           console.log('POST request successful', data);
+          this.toast.success({detail:'Success',summary:'Saved new data to the database',position:'topRight', duration:1500});
         },
         error: (error) => {
           console.error('POST request failed', error);
+          this.toast.error({detail:'Error',summary:'This is Error',position:'topRight', duration:1500});
         },
       });
   }
-  error_check(){
-    if (this.goten_value_dcombobox_Check.length=== 0){
-      this.error='*missing'
-    }else{
-      this.error=''
+  error_check() {
+    if (this.goten_value_dcombobox_Check.length === 0) {
+      this.error = '*missing';
+    } else {
+      this.error = '';
     }
   }
-
 }
-
 // tree ///// for tree data initiaion
 export interface TreeNode {
   Id: any;

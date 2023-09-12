@@ -37,6 +37,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
+import {NgToastModule} from 'ng-angular-popup';
+
 import { NgFor, NgIf } from '@angular/common';
 
 import { MatSelectModule } from '@angular/material/select';
@@ -53,6 +55,7 @@ const routes: Routes = [
     BrowserModule,
     MatListModule,
     MatRadioModule,
+    NgToastModule,
     MatDividerModule,
     MatCheckboxModule,
     FormsModule,
@@ -77,7 +80,7 @@ const routes: Routes = [
     RouterModule.forRoot(routes),
     MatSelectModule,
     ReactiveFormsModule,
-    
+
   ],
   providers: [],
   exports: [RouterModule],
