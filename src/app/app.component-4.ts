@@ -103,7 +103,7 @@ export class AppComponent4 implements AfterViewInit {
     // add or remove the clicked row from the set
   }
   getData_forthetable_http() {
-    return this.http.get<any>('http://a7d8f07df7c4f4e498670422e576b190-464247745.eu-north-1.elb.amazonaws.com/api/TreeData/newww');
+    return this.http.get<any>('http://a6bad24f8e8734c00a762be14dbb2110-2139058781.eu-north-1.elb.amazonaws.com/api/TreeData/newww');
   }
   ngAfterViewInit(): void {
     this.getData_forthetable_http().subscribe((data) => {
@@ -147,7 +147,7 @@ export class AppComponent4 implements AfterViewInit {
   this.novalidata="*missing"
  }else{
   this.novalidata=""
-  fetch('http://a7d8f07df7c4f4e498670422e576b190-464247745.eu-north-1.elb.amazonaws.com/api/TreeData/newww', {
+  fetch('http://a6bad24f8e8734c00a762be14dbb2110-2139058781.eu-north-1.elb.amazonaws.com/api/TreeData/newww', {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json'
@@ -177,7 +177,7 @@ export class AppComponent4 implements AfterViewInit {
 
  }
     // this is delete command but with no data input thats why we used fetch above
-    // this.http.delete('http://a7d8f07df7c4f4e498670422e576b190-464247745.eu-north-1.elb.amazonaws.com/api/TreeData/newww'
+    // this.http.delete('http://a6bad24f8e8734c00a762be14dbb2110-2139058781.eu-north-1.elb.amazonaws.com/api/TreeData/newww'
     // ).subscribe(response => {
     //   console.log(response);
     // }, error => {
@@ -534,7 +534,7 @@ stoppad(event: MouseEvent , uu:string){
     console.log(JSON.stringify(this.dataSource.data));
     this.datttt = this.dataSource.data;
     this.http
-      .post<any>('http://a7d8f07df7c4f4e498670422e576b190-464247745.eu-north-1.elb.amazonaws.com/api/TreeData/newww', this.datttt)
+      .post<any>('http://a6bad24f8e8734c00a762be14dbb2110-2139058781.eu-north-1.elb.amazonaws.com/api/TreeData/newww', this.datttt)
       .subscribe({
         next: (data) => {
           //// <== old code
