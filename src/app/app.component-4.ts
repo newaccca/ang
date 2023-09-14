@@ -6,6 +6,7 @@ import {
   ChangeDetectorRef,
   ElementRef,
   Renderer2,
+  HostListener ,
 } from '@angular/core';
 import { NgToastService } from 'ng-angular-popup';
 
@@ -47,7 +48,17 @@ export interface UserData {
   templateUrl: './app.component-4.html',
   styleUrls: ['./app.component-4.css'],
 })
+
 export class AppComponent4 implements AfterViewInit {
+  dataNotSaved = false;
+
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any) {
+    if (this.dataNotSaved) {
+      $event.returnValue = true;
+    }
+  }
+
   displayedColumns: string[] = [
     'dcombobox',
     'dcombobox_Check',
@@ -92,6 +103,9 @@ export class AppComponent4 implements AfterViewInit {
   // initaion for sorting and pagintaing for the tables
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
+  isRowClicked(row: any): boolean {
+    return this.clickedRows.has(row);
+  }
 
   // row click function for the tables
   rowclick(event: MouseEvent, row: any) {
@@ -103,7 +117,10 @@ export class AppComponent4 implements AfterViewInit {
     // add or remove the clicked row from the set
   }
   getData_forthetable_http() {
-    return this.http.get<any>('http://a6bad24f8e8734c00a762be14dbb2110-2139058781.eu-north-1.elb.amazonaws.com/api/TreeData/newww');
+    return this.http.get<any>('http://localhost:5241/api/TreeData/newww');
+  }
+  getData_clickedrows_http() {
+    return this.http.get<any>('http://localhost:5241/api/TreeData/clickedRows');
   }
   ngAfterViewInit(): void {
     this.getData_forthetable_http().subscribe((data) => {
@@ -113,6 +130,28 @@ export class AppComponent4 implements AfterViewInit {
       this.dataSource.sort = this.sort;
       this.filter_call();
     });
+
+    this.getData_clickedrows_http().subscribe((data: any[]) => {
+      console.log(data)
+      //Map the data to match the UserData interface
+      const mappedData = data.map(item => {
+        return {
+          dcombobox: item.dcombobox,
+          dcombobox_Check: item.dcombobox_Check,
+          dtextbox: item.dtextbox,
+          dradio_btn: item.dradio_btn,
+          dcheck: item.dcheck,
+          dtoggle: item.dtoggle,
+          detailRow: item.detailRow
+        } as UserData;
+      });
+
+      // Convert the mapped data into a Set
+      this.clickedRows = new Set<UserData>(mappedData);
+            this.cd.detectChanges();
+    });
+    this.cd.detectChanges();
+
   }
   select_rowclick(event: MouseEvent, row: any) {
     // add or remove the clicked row from the set
@@ -121,7 +160,12 @@ export class AppComponent4 implements AfterViewInit {
     } else {
       this.clickedRows.add(row);
     }
-    console.log(this.clickedRows);
+    if (Array.from(this.clickedRows).length === 0){
+      this.dataNotSaved=false
+    }else{
+      this.dataNotSaved=true
+    }
+    console.log((row));
   }
 
   // on start code initiation
@@ -131,23 +175,79 @@ export class AppComponent4 implements AfterViewInit {
     this.filter_call();
   }
   novalidata='';
-  novali(validation:any){
+  novali(validation:any, dialog_name: any){
     if (validation === '') {
       this.novalidata="*missing"
      }else{
       this.novalidata=""
-      this.delete_from_db_function(validation)
-      let inputField = document.getElementById('validation') as HTMLInputElement;
+
+
+
+      if (dialog_name._declarationTContainer.localNames[0] == 'delete_dialog') {
+        this.delete_from_db_function(validation);
+      } else if (dialog_name._declarationTContainer.localNames[0] == 'delete_clicked_dialog')  {
+        this.delete_from_clicked_db_function(validation);
+      }
+      let inputField = document.getElementById('validation2') as HTMLInputElement;
       inputField.value = '';
      }
   }
+
+  delete_from_clicked_db_function(validation:string){
+    let dd = validation;
+    let del= Array.from(this.clickedRows)
+
+    console.log(validation)
+    if (validation === '') {
+  this.novalidata="*missing"
+ }else{
+  this.novalidata=""
+  fetch('http://localhost:5241/api/TreeData/clickedRows', {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+
+    body: JSON.stringify({ del, dd })
+
+  })
+  .then(data => {console.log(data);
+  if (data.status==200){
+    this.novalidata=''
+    this.toast.success({detail:'Success',summary:'Items has been deleted successfully',position:'topRight', duration:1500});
+    this.dataSource.data=[];
+    this.public_clsoe_Dialog()
+    this.filter_call()
+    this.ngAfterViewInit()
+  }else{
+    this.novalidata = 'Error ' + (data.status == 401 ? '401 Unauthorized' : data.status)
+    this.toast.error({detail:'Error',summary:('Error ' + (data.status == 401 ? '401 Unauthorized' : data.status)),position:'topRight', duration:1500});
+  }
+  } )
+
+  .catch((error) => {
+    this.novalidata = 'Error ' + error
+    console.error('Error:', error);this.toast.error({detail:'Error',summary:('Error' +error),position:'topRight', duration:1500});
+
+  });
+
+ }
+    // this is delete command but with no data input thats why we used fetch above
+    // this.http.delete('http://localhost:5241/api/TreeData/newww'
+    // ).subscribe(response => {
+    //   console.log(response);
+    // }, error => {
+    //   console.error(error);
+    // });
+  }
+
   delete_from_db_function(validation:string){
     console.log(validation)
     if (validation === '') {
   this.novalidata="*missing"
  }else{
   this.novalidata=""
-  fetch('http://a6bad24f8e8734c00a762be14dbb2110-2139058781.eu-north-1.elb.amazonaws.com/api/TreeData/newww', {
+  fetch('http://localhost:5241/api/TreeData/newww', {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json'
@@ -177,7 +277,7 @@ export class AppComponent4 implements AfterViewInit {
 
  }
     // this is delete command but with no data input thats why we used fetch above
-    // this.http.delete('http://a6bad24f8e8734c00a762be14dbb2110-2139058781.eu-north-1.elb.amazonaws.com/api/TreeData/newww'
+    // this.http.delete('http://localhost:5241/api/TreeData/newww'
     // ).subscribe(response => {
     //   console.log(response);
     // }, error => {
@@ -509,6 +609,7 @@ stoppad(event: MouseEvent , uu:string){
   l: number = 1;
   error: any = '';
   save_from_html_function() {
+
     let data = this.get_from_html_function();
     if (this.goten_value_dcombobox_Check.length === 0) {
       // this.goten_value_dcombobox_Check is empty
@@ -527,19 +628,44 @@ stoppad(event: MouseEvent , uu:string){
     this.filter_call();
     this.onSelectChange2(5);
     this.cd.detectChanges();
+    this.dataNotSaved=true;
     }
   }
   datttt: any;
+  save_from_html_toclickeddb_function() {
+    if (window.confirm('Are you sure you want to save all of the selected items ?')) {
+    console.log((this.clickedRows));
+    this.datttt =  Array.from(this.clickedRows);  // this must be converted to arry
+    this.http
+      .post<any>('http://localhost:5241/api/TreeData/clickedRows', this.datttt)
+      .subscribe({
+        next: (data) => {
+          //// <== old code
+          console.log('POST request successful', data);
+          this.toast.success({detail:'Success',summary:'Saved new clickedrows data to the database',position:'topRight', duration:1500});
+                this.dataNotSaved = false;
+        },
+        error: (error) => {
+          console.error('POST request failed', error);
+          this.toast.error({detail:'Error',summary:( 'This is Error'),position:'topRight', duration:1500});
+        },
+      });
+    } else {
+      // User clicked 'Cancel', do not perform the action
+    }
+
+  }
   save_from_html_todb_function() {
     console.log(JSON.stringify(this.dataSource.data));
     this.datttt = this.dataSource.data;
     this.http
-      .post<any>('http://a6bad24f8e8734c00a762be14dbb2110-2139058781.eu-north-1.elb.amazonaws.com/api/TreeData/newww', this.datttt)
+      .post<any>('http://localhost:5241/api/TreeData/newww', this.datttt)
       .subscribe({
         next: (data) => {
           //// <== old code
           console.log('POST request successful', data);
           this.toast.success({detail:'Success',summary:'Saved new data to the database',position:'topRight', duration:1500});
+                this.dataNotSaved = false;
         },
         error: (error) => {
           console.error('POST request failed', error);

@@ -45,6 +45,8 @@
 <div align="center">
    <button mat-raised-button (click)="save_from_html_function()"> Save
   </button>
+  <button mat-raised-button (click)="save_from_html_toclickeddb_function()"> Save clicked
+  </button>
   <button mat-raised-button (click)="save_from_html_todb_function()"> Save to db
   </button>
 </div>
@@ -53,6 +55,9 @@
 <div align="center">
   <button style="width: 25%;" mat-raised-button (click)="pupblic_opendialog_function(delete_dialog, 'auto' , 'auto')"> Clear db
   </button>
+  <button style="width: 25%;" mat-raised-button (click)="pupblic_opendialog_function(delete_clicked_dialog, 'auto' , 'auto')"> Clear clicked
+  </button>
+
 </div>
   <mat-divider></mat-divider>
   <div align="center" class="btn-holder">
@@ -115,28 +120,28 @@
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="select_rowclick($event, row)"
-          [ngClass]="{'bold': clickedRows.has(row)}" [class.demo-row-is-clicked]="clickedRows.has(row)"></tr>
+          [ngClass]="{'bold': clickedRows.has(row)}" [class.bold]="isRowClicked(row)" [class.demo-row-is-clicked]="clickedRows.has(row)"></tr>
       </table>
     </div>
   </div>
+  <mat-paginator [length]="pgsize" [pageSize]="leng">
+  </mat-paginator>
   <div align="center">
     <h3>Click Log</h3>
   </div>
   <div align="center" *ngIf="!clickedRows.size">Clicked rows will be logged here</div>
   <ul>
     <li *ngFor="let clickedRow of clickedRows">
-      Clicked on {{ clickedRow.dcombobox }}
+      Clicked on {{ clickedRow.dcombobox_Check }}
     </li>
   </ul>
-  <mat-paginator [length]="pgsize" [pageSize]="leng">
-  </mat-paginator>
 </div>
 <ng-template #delete_dialog>
 <div  style=" display: flex; flex-direction: column; justify-content: center; align-items: center; width: 450px; height: 225px; border: 2.25px solid red; border-radius: 4px;">
   <div  >
     <mat-form-field>
       <mat-label>Your db Secret</mat-label>
-      <input style="width: 40%;" matInput placeholder="******" type="password" (change)="novali(validation.value)" id="validation" #validation>
+      <input style="width: 40%;" matInput placeholder="******" type="password" (change)="novali((validation.value),delete_dialog)" id="validation" #validation>
     </mat-form-field>
     <mat-label style="width: auto; color: red; position: absolute;">{{novalidata}}</mat-label>
 
@@ -149,6 +154,24 @@
 </div>
 </div>
 </ng-template>
+<ng-template #delete_clicked_dialog>
+  <div  style=" display: flex; flex-direction: column; justify-content: center; align-items: center; width: 450px; height: 225px; border: 2.25px solid red; border-radius: 4px;">
+    <div  >
+      <mat-form-field>
+        <mat-label>Your db Secret</mat-label>
+        <input style="width: 40%;" matInput placeholder="******" type="password" (change)="novali((validation2.value),delete_clicked_dialog )" id="validation2" #validation2>
+      </mat-form-field>
+      <mat-label style="width: auto; color: red; position: absolute;">{{novalidata}}</mat-label>
+
+    </div>
+  <div style="  display: flex;justify-content: center; align-items: center;">
+    <button mat-raised-button (click)="delete_from_clicked_db_function(validation2.value)"> Yes
+    </button>
+     <button mat-raised-button (click)="public_clsoe_Dialog()"> No
+    </button>
+  </div>
+  </div>
+  </ng-template>
 <ng-template #dialog_1>
   <div align="center" class="bottm-panel" style="width: 100%; overflow-y: auto; ">
     <div style="overflow-x: autoweb; max-height: 550px;">
@@ -207,8 +230,9 @@
                 when: isExpansionDetailRow
               " [hidden]="!isRowExpanded(row)"></tr>
       </table>
+      <mat-paginator [length]="dialog_pgsize" [pageSize]="dialog_leng" aria-label="Select page of GitHub search results">
+      </mat-paginator>
     </div>
-    <mat-paginator [length]="dialog_pgsize" [pageSize]="dialog_leng" aria-label="Select page of GitHub search results">
-    </mat-paginator>
+
   </div>
 </ng-template>
